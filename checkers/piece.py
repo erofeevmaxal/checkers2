@@ -1,5 +1,5 @@
 import pygame
-from .constants import LIGHT, DARK, SQUARE_SIZE, BOX_SIZE, PIECE_DIAM, PIECE_BORDER, PIECE_BORDER_COLLOR
+from .constants import LIGHT, DARK, SQUARE_SIZE, BOX_SIZE, PIECE_DIAM, OUTLINE, OUTLINE_COLLOR
 
 
 class Piece:
@@ -22,5 +22,5 @@ class Piece:
         self.king = True
         
     def draw(self, window):
-        pygame.draw.circle(window, PIECE_BORDER_COLLOR, (self.x, self.y), PIECE_DIAM // 2 + PIECE_BORDER)
+        pygame.draw.circle(window, OUTLINE_COLLOR, (self.x, self.y), PIECE_DIAM // 2 + OUTLINE)
         pygame.draw.circle(window, self.color, (self.x, self.y), PIECE_DIAM // 2)

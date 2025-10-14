@@ -8,6 +8,7 @@ pygame.display.set_caption('Сheckers')
 
 def main():
     board = Board()
+    board.create_board()
     run = True
     
     while run:
@@ -20,6 +21,7 @@ def main():
                 pass
         
         board.draw_squares(WINDOW)
+        board.draw_pieces(WINDOW)
         pygame.display.update()
     pygame.quit()
     
