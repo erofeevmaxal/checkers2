@@ -25,7 +25,7 @@ class Board:
                 self.board[row][col] = Piece(row, col, BLACK)
                 
         for row in range(ROWS - LINES, ROWS):
-            for col in range(row % 2, COLS, 2):
+            for col in range(1 - row % 2, COLS, 2):
                 self.board[row][col] = Piece(row, col, WHITE)
 
     def draw_pieces(self, window):
