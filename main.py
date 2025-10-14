@@ -11,6 +11,10 @@ def main():
     board.create_board()
     run = True
     
+    piece = board.get_piece(0, 1)
+    print(piece)
+    board.move_piece(piece, 3, 3)
+    
     while run:
         
         for event in pygame.event.get():

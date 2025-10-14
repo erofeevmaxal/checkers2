@@ -15,3 +15,6 @@ OUTLINE_COLLOR = (128, 128, 128)
 
 PIECE_DIAM = 0.6 * SQUARE_SIZE
 OUTLINE = 3
+
+CROWN_WHITE = pygame.transform.scale(pygame.image.load('assets/crown_white.png'), (45, 30))
+CROWN_BLACK = pygame.transform.scale(pygame.image.load('assets/crown_black.png'), (45, 30))

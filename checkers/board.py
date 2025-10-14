@@ -11,6 +11,9 @@ class Board:
         self.white_left = self.black_left = 12
         self.white_kings = self.black_kings = 0
         
+    def get_piece(self, row, col):
+        return self.board[row][col]
+        
     def draw_squares(self, window):
         window.fill(BOX_COLLOR)
         pygame.draw.rect(window, LIGHT, (BOX_SIZE, BOX_SIZE, WIDTH, HEIGHT))
@@ -35,3 +38,23 @@ class Board:
                     continue
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
+                    
+    def draw_all(self, window):
+        self.draw_pieces(window)
+        self.draw_squares(window)
+        
+    def move_piece(self, piece, row, col) -> int:
+        if self.board[row][col] != 0:
+            return 0
+        
+        self.board[piece.row][piece.col] = 0
+        self.board[row][col] = piece
+        piece.move(row, col)
+        
+        if row == ROWS or row == 0:
+            piece.make_king()
+            if piece.color == WHITE:
+                self.white_kings += 1
+            else:
+                self.black_kings += 1
+        return 1

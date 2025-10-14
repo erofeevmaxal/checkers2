@@ -1,5 +1,5 @@
 import pygame
-from .constants import LIGHT, DARK, SQUARE_SIZE, BOX_SIZE, PIECE_DIAM, OUTLINE, OUTLINE_COLLOR
+from .constants import SQUARE_SIZE, BOX_SIZE, PIECE_DIAM, OUTLINE, OUTLINE_COLLOR, CROWN_WHITE, CROWN_BLACK, WHITE, BLACK
 
 
 class Piece:
@@ -9,7 +9,7 @@ class Piece:
         self.color = color
         self.king = False
         
-        self.direction = 1 if color == DARK else -1
+        self.direction = 1 if color == BLACK else -1
         self.x = 0
         self.y = 0
         self.calculate_pos()
@@ -20,7 +20,20 @@ class Piece:
         
     def make_king(self):
         self.king = True
+    
+    def draw_crown(self, window):
+        image = CROWN_WHITE if self.color == WHITE else CROWN_BLACK
+        window.blit(image, (self.x - image.get_width() // 2, self.y - image.get_height() // 2))
+            
         
     def draw(self, window):
         pygame.draw.circle(window, OUTLINE_COLLOR, (self.x, self.y), PIECE_DIAM // 2 + OUTLINE)
         pygame.draw.circle(window, self.color, (self.x, self.y), PIECE_DIAM // 2)
+        
+        if self.king:
+            self.draw_crown(window)
+    
+    def move(self, row, col):
+        self.row = row
+        self.col = col
+        self.calculate_pos()
