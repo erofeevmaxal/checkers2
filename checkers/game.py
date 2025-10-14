@@ -36,11 +36,16 @@ class Game:
         return False
         
     def move(self, row, col) -> bool:
-        target = self.board.get_piece(row, col)
-        if self.selected and not target and (row, col) in self.valid_moves():
+        if (row, col) in self.walking_moves:
             self.board.move_piece(self.selected, row, col)
-            return True
-        return False
+            
+        elif (row, col) in self.attacking_moves:
+            self.board.move_piece(self.selected, row, col)        
+            
+        else:
+            return False
+        
+        return True
 
     def change_turn(self):
         if self.turn == WHITE:
