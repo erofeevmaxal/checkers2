@@ -1,19 +1,54 @@
 import pygame
 from .board import Board
-from .constants import WHITE, DARK
+from .constants import WHITE, BLACK
 
 class Game:
-    def __init__(self, board: Board):
+    def __init__(self, window):
         self.turn = WHITE
-        self.board = board
+        self.selected = None
+        self.attacking_moves = set()
+        self.walking_moves = set()
+        self.window = window
         
-    def move(self, x, y, target_x, target_y):
-        pass
+        self.board = Board()
+        self.board.create_board()
+        
+    def update(self):
+        self.board.draw(self.window)
+        if self.selected:
+            self.attacking_moves = self.board.get_attacking_moves(self.selected)
+            self.walking_moves = self.board.get_walknig_moves(self.selected)
+        self.draw_valid_moves()
+        pygame.display.update()
+        
+    def select(self, row, col) -> bool:
+        if self.selected:
+            result = self.move(row, col)
+            if not result:
+                self.selected = None
+                self.select(row, col)
+        
+        piece = self.board.get_piece(row, col)
+        if piece and piece.color == self.turn:
+            self.selected = piece
+            self.valid_moves = self.board.get_valid_moves(piece)
+            return True
+        return False
+        
+    def move(self, row, col) -> bool:
+        target = self.board.get_piece(row, col)
+        if self.selected and not target and (row, col) in self.valid_moves():
+            self.board.move_piece(self.selected, row, col)
+            return True
+        return False
 
-    def atack(self, x, y, target_x, target_y):
-        pass
-    
-    def process_mousebutton(self, event):
-        pass
-    
-    
+    def change_turn(self):
+        if self.turn == WHITE:
+            self.turn = BLACK
+        else:
+            self.turn = WHITE
+
+    def draw_valid_moves(self):
+        if self.selected:
+            for move in self.attacking_moves | self.walking_moves:
+                self.board.draw_valid_move(self.window, move)

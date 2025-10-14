@@ -8,6 +8,7 @@ class Piece:
         self.col = col
         self.color = color
         self.king = False
+        self.attack = False
         
         self.direction = 1 if color == BLACK else -1
         self.x = 0

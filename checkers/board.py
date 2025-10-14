@@ -1,18 +1,28 @@
 import pygame
 from .piece import Piece
-from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, HEIGHT, LINES, BLACK, WHITE
+from typing import Tuple, Set
+from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, HEIGHT, LINES, BLACK, WHITE, OUTLINE_COLLOR, MOVE_RAD
 
 
 
 class Board:
     def __init__(self):
         self.board = [[0]*COLS for i in range(ROWS)]
-        selected_piece = None
         self.white_left = self.black_left = 12
         self.white_kings = self.black_kings = 0
-        
+    
+    def inside(self, row, col):
+        return 0 <= row < ROWS and 0 <= col < COLS
+
     def get_piece(self, row, col):
+        if not self.inside(row, col):
+            return -1
         return self.board[row][col]
+    
+    def calculate_pos(self, row, col):
+        x = SQUARE_SIZE * col + BOX_SIZE + SQUARE_SIZE // 2
+        y = SQUARE_SIZE * row + BOX_SIZE + SQUARE_SIZE // 2
+        return (x, y)
         
     def draw_squares(self, window):
         window.fill(BOX_COLLOR)
@@ -38,10 +48,14 @@ class Board:
                     continue
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
+    
+    def draw_valid_move(self, window, move: Tuple[int, int]):
+        row, col = move
+        pygame.draw.circle(window, OUTLINE_COLLOR, self.calculate_pos(row, col), MOVE_RAD)
                     
-    def draw_all(self, window):
-        self.draw_pieces(window)
+    def draw(self, window):
         self.draw_squares(window)
+        self.draw_pieces(window)
         
     def move_piece(self, piece, row, col) -> int:
         if self.board[row][col] != 0:
@@ -58,3 +72,40 @@ class Board:
             else:
                 self.black_kings += 1
         return 1
+        
+        
+    def get_walknig_moves(self, piece: Piece):
+        output = set()
+
+        for y in (-1, 1):
+            pos = self.get_piece(piece.row + piece.direction, piece.col + y)
+            if pos == 0:
+                output.add((piece.row + piece.direction, piece.col + y))
+                
+        return output       
+            
+    def get_attacking_moves(self, piece: Piece):
+        output = set()
+        
+        for x in (-1, 1):
+            for y in (-1, 1):
+                first = self.get_piece(piece.row + x, piece.col + y)
+                second = self.get_piece(piece.row + x * 2, piece.col + y * 2)
+                if first and second == 0 and first.color != piece.color:
+                    output.add((piece.row + x * 2, piece.col + y * 2))
+        return output
+    
+    def get_valid_moves(self, piece: Piece):
+        moves = {}
+        
+        if piece.color == WHITE:
+            if piece.king:
+                pass
+            else:
+                pass
+        else:
+            if piece.king:
+                pass
+            else:
+                pass
+            
