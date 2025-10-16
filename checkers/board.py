@@ -49,8 +49,8 @@ class Board:
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
     
-    def draw_valid_move(self, window, move: Tuple[int, int]):
-        row, col = move
+    def draw_valid_move(self, window, move):
+        row, col, target = move
         pygame.draw.circle(window, OUTLINE_COLLOR, self.calculate_pos(row, col), MOVE_RAD)
                     
     def draw(self, window):
@@ -65,7 +65,7 @@ class Board:
         self.board[row][col] = piece
         piece.move(row, col)
         
-        if row == ROWS or row == 0:
+        if row == ROWS - 1 or row == 0:
             piece.make_king()
             if piece.color == WHITE:
                 self.white_kings += 1
@@ -73,18 +73,20 @@ class Board:
                 self.black_kings += 1
         return 1
         
-        
-    def get_walknig_moves(self, piece: Piece):
+    def remove_piece(self, piece):
+        self.board[piece.row][piece.col] = 0
+    
+    def get_сhecker_walknig_moves(self, piece: Piece):
         output = set()
 
         for y in (-1, 1):
             pos = self.get_piece(piece.row + piece.direction, piece.col + y)
             if pos == 0:
-                output.add((piece.row + piece.direction, piece.col + y))
+                output.add((piece.row + piece.direction, piece.col + y, None))
                 
         return output       
             
-    def get_attacking_moves(self, piece: Piece):
+    def get_checker_attacking_moves(self, piece: Piece):
         output = set()
         
         for x in (-1, 1):
@@ -92,20 +94,32 @@ class Board:
                 first = self.get_piece(piece.row + x, piece.col + y)
                 second = self.get_piece(piece.row + x * 2, piece.col + y * 2)
                 if first and second == 0 and first.color != piece.color:
-                    output.add((piece.row + x * 2, piece.col + y * 2))
+                    output.add((piece.row + x * 2, piece.col + y * 2, first))
         return output
     
-    def get_valid_moves(self, piece: Piece):
-        moves = {}
-        
-        if piece.color == WHITE:
-            if piece.king:
-                pass
-            else:
-                pass
+    def get_valid_moves(self, piece, must_attack):
+        if piece.king:
+            pass
         else:
-            if piece.king:
-                pass
-            else:
-                pass
-            
+            attacking_moves = self.get_checker_attacking_moves(piece)
+            if attacking_moves or must_attack:
+                return attacking_moves
+            return self.get_сhecker_walknig_moves(piece)
+
+    def possible_to_attack(self, turn):
+        for row in range(ROWS):
+            for col in range(COLS):
+                piece = self.get_piece(row, col)
+                if not piece:
+                    continue
+                if piece.color != turn:
+                    continue
+                
+                if piece.king:
+                    pass
+                else:
+                    moves = self.get_checker_attacking_moves(piece)
+                    
+                if moves:
+                    return True
+        return False

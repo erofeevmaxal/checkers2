@@ -38,3 +38,6 @@ class Piece:
         self.row = row
         self.col = col
         self.calculate_pos()
+        
+    def print(self):
+        return (self.row, self.col)

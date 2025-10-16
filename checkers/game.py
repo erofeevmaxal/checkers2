@@ -6,8 +6,9 @@ class Game:
     def __init__(self, window):
         self.turn = WHITE
         self.selected = None
-        self.attacking_moves = set()
-        self.walking_moves = set()
+        self.valid_moves = set()
+        self.attack_continue = False
+        self.must_attack = False
         self.window = window
         
         self.board = Board()
@@ -15,45 +16,72 @@ class Game:
         
     def update(self):
         self.board.draw(self.window)
+        
         if self.selected:
-            self.attacking_moves = self.board.get_attacking_moves(self.selected)
-            self.walking_moves = self.board.get_walknig_moves(self.selected)
+            self.valid_moves = self.board.get_valid_moves(self.selected, self.must_attack)
+            
         self.draw_valid_moves()
         pygame.display.update()
         
     def select(self, row, col) -> bool:
+        
         if self.selected:
             result = self.move(row, col)
-            if not result:
+            if not result and not self.attack_continue:
                 self.selected = None
                 self.select(row, col)
-        
-        piece = self.board.get_piece(row, col)
-        if piece and piece.color == self.turn:
-            self.selected = piece
-            self.valid_moves = self.board.get_valid_moves(piece)
-            return True
+        else:
+            piece = self.board.get_piece(row, col)
+            if piece and piece.color == self.turn:
+                self.selected = piece
+                self.valid_moves = self.board.get_valid_moves(piece, self.must_attack)
+                return True
         return False
         
     def move(self, row, col) -> bool:
-        if (row, col) in self.walking_moves:
-            self.board.move_piece(self.selected, row, col)
-            
-        elif (row, col) in self.attacking_moves:
-            self.board.move_piece(self.selected, row, col)        
-            
-        else:
+        move = self.find_valid_move(row, col)
+        if not move:
             return False
         
+        row, col, target = move
+        
+        if target:
+            self.board.move_piece(self.selected, row, col)
+            self.board.remove_piece(target)
+            
+            self.attack_continue = True
+            
+            piece = self.board.get_piece(row, col)
+            
+            if not self.board.get_valid_moves(piece, self.must_attack):
+                self.change_turn()
+            
+        else:
+            self.board.move_piece(self.selected, row, col)
+            self.change_turn()
+            
         return True
+    
+    def find_valid_move(self, row, col):
+        for move in self.valid_moves:
+            if (row, col) == (move[0], move[1]):
+                return move
+        return None
 
-    def change_turn(self):
+    def change_turn(self):        
         if self.turn == WHITE:
             self.turn = BLACK
         else:
             self.turn = WHITE
 
+        self.selected = None
+        self.attack_continue = False
+        self.must_attack = self.board.possible_to_attack(self.turn)
+
+
     def draw_valid_moves(self):
         if self.selected:
-            for move in self.attacking_moves | self.walking_moves:
+            for move in self.valid_moves:
                 self.board.draw_valid_move(self.window, move)
+                
+ 

@@ -14,7 +14,6 @@ def get_row_col_from_mouse(pos):
 
 def main():
     game = Game(WINDOW)
-    game.selected = game.board.board[1][2]
     run = True
         
     while run:
