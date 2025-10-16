@@ -48,7 +48,8 @@ class Board:
                     continue
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
-    
+
+
     def draw_valid_move(self, window, move):
         row, col, target = move
         pygame.draw.circle(window, OUTLINE_COLLOR, self.calculate_pos(row, col), MOVE_RAD)
@@ -97,9 +98,50 @@ class Board:
                     output.add((piece.row + x * 2, piece.col + y * 2, first))
         return output
     
+    def get_king_walking_moves(self, piece):
+        output = set()
+        
+        for x in (-1, 1):
+            for y in (-1, 1):
+                for step in range(1, 8):
+                    row, col = piece.row + x * step, piece.col + y * step
+                    square = self.get_piece(row, col)
+                    if square:
+                        break
+                    
+                    output.add((row, col, None))
+        return output
+                    
+    def get_king_attacking_moves(self, piece):
+        output = set()
+        target = None
+    
+        for x in (-1, 1):
+            for y in (-1, 1):
+                for step in range(1, 8):
+                    row, col = piece.row + x * step, piece.col + y * step
+                    square = self.get_piece(row, col)
+                    if square == -1:
+                        break
+                    
+                    if square:
+                        if square.color == piece.color:
+                            break
+                        else:
+                            target = square
+                    elif target:
+                        output.add((row, col, target))
+                
+                target = None
+        return output
+                                                     
     def get_valid_moves(self, piece, must_attack):
         if piece.king:
-            pass
+            attacking_moves = self.get_king_attacking_moves(piece)
+            if attacking_moves or must_attack:
+                return attacking_moves
+            return self.get_king_walking_moves(piece)
+        
         else:
             attacking_moves = self.get_checker_attacking_moves(piece)
             if attacking_moves or must_attack:
@@ -116,7 +158,7 @@ class Board:
                     continue
                 
                 if piece.king:
-                    pass
+                    moves = self.get_king_attacking_moves(piece)
                 else:
                     moves = self.get_checker_attacking_moves(piece)
                     

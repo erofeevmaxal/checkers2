@@ -35,7 +35,9 @@ class Game:
             if piece and piece.color == self.turn:
                 self.selected = piece
                 self.valid_moves = self.board.get_valid_moves(piece, self.must_attack)
+    
                 return True
+            
         return False
         
     def move(self, row, col) -> bool:
