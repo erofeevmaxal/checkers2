@@ -1,29 +1,28 @@
 import pygame
 from .piece import Piece
-from typing import Tuple, Set
-from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, HEIGHT, LINES, BLACK, WHITE, OUTLINE_COLLOR, MOVE_RAD, FONT_SIZE
-
+from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, \
+    HEIGHT, LINES, BLACK, WHITE, OUTLINE_COLLOR, MOVE_RAD, FONT_SIZE
 
 
 class Board:
-    def __init__(self):
+    def __init__(self) -> None:
         self.board = [[0]*COLS for i in range(ROWS)]
         self.white_left = self.black_left = 12
     
-    def inside(self, row, col):
+    def inside(self, row: int, col: int) -> bool:
         return 0 <= row < ROWS and 0 <= col < COLS
 
-    def get_piece(self, row, col):
+    def get_piece(self, row: int, col: int) -> int | Piece:
         if not self.inside(row, col):
             return -1
         return self.board[row][col]
     
-    def calculate_pos(self, row, col):
+    def calculate_pos(self, row: int, col: int) -> tuple[int, int]:
         x = SQUARE_SIZE * col + BOX_SIZE + SQUARE_SIZE // 2
         y = SQUARE_SIZE * row + BOX_SIZE + SQUARE_SIZE // 2
         return (x, y)
         
-    def create_board(self):
+    def create_board(self) -> None:
         for row in range(LINES):
             for col in range(1 - row % 2, COLS, 2):
                 self.board[row][col] = Piece(row, col, BLACK)
@@ -32,7 +31,7 @@ class Board:
             for col in range(1 - row % 2, COLS, 2):
                 self.board[row][col] = Piece(row, col, WHITE)        
     
-    def draw_squares(self, window):
+    def draw_squares(self, window: pygame.Surface) -> None:
         window.fill(BOX_COLLOR)
         pygame.draw.rect(window, LIGHT, (BOX_SIZE, BOX_SIZE, WIDTH, HEIGHT))
         
@@ -40,7 +39,7 @@ class Board:
             for col in range(1 - row % 2, COLS, 2):
                 pygame.draw.rect(window, DARK, (BOX_SIZE + SQUARE_SIZE * col, BOX_SIZE + SQUARE_SIZE * row, SQUARE_SIZE, SQUARE_SIZE))
 
-    def draw_pieces(self, window):
+    def draw_pieces(self, window: pygame.Surface) -> None:
         for row in range(ROWS):
             for col in range(COLS):
                 if self.board[row][col] == 0:
@@ -48,7 +47,7 @@ class Board:
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
 
-    def draw_coordinates(self, window):
+    def draw_coordinates(self, window: pygame.Surface) -> None:
         for col in range(COLS):
             x = BOX_SIZE + col * SQUARE_SIZE + SQUARE_SIZE // 2
             y1 = BOX_SIZE // 2
@@ -77,16 +76,16 @@ class Board:
             window.blit(text, text_rect1)
             window.blit(text, text_rect2)
             
-    def draw_valid_move(self, window, move):
+    def draw_valid_move(self, window: pygame.Surface, move: tuple[int, int, Piece | None]) -> None:
         row, col, target = move
         pygame.draw.circle(window, OUTLINE_COLLOR, self.calculate_pos(row, col), MOVE_RAD)
                 
-    def draw(self, window):
+    def draw(self, window: pygame.Surface) -> None:
         self.draw_squares(window)
         self.draw_pieces(window)
         self.draw_coordinates(window)
         
-    def move_piece(self, piece, row, col) -> int:
+    def move_piece(self, piece: Piece, row: int, col: int) -> int:
         if self.board[row][col] != 0:
             return 0
         
@@ -99,7 +98,7 @@ class Board:
 
         return 1
         
-    def remove_piece(self, piece):
+    def remove_piece(self, piece: Piece) -> None:
         self.board[piece.row][piece.col] = 0
         
         if piece.color == WHITE:
@@ -107,7 +106,7 @@ class Board:
         else:
             self.black_left -= 1
     
-    def get_сhecker_walknig_moves(self, piece: Piece):
+    def get_checker_walking_moves(self, piece: Piece) -> set[tuple[int, int, None]]:
         output = set()
 
         for y in (-1, 1):
@@ -117,7 +116,7 @@ class Board:
                 
         return output       
             
-    def get_checker_attacking_moves(self, piece: Piece):
+    def get_checker_attacking_moves(self, piece: Piece) -> set[tuple[int, int, Piece]]:
         output = set()
         
         for x in (-1, 1):
@@ -128,7 +127,7 @@ class Board:
                     output.add((piece.row + x * 2, piece.col + y * 2, first))
         return output
     
-    def get_king_walking_moves(self, piece):
+    def get_king_walking_moves(self, piece: Piece) -> set[tuple[int, int, None]]:
         output = set()
         
         for x in (-1, 1):
@@ -142,7 +141,7 @@ class Board:
                     output.add((row, col, None))
         return output
                     
-    def get_king_attacking_moves(self, piece):
+    def get_king_attacking_moves(self, piece: Piece) -> set[tuple[int, int, Piece]]:
         output = set()
         target = None
     
@@ -165,7 +164,7 @@ class Board:
                 target = None
         return output
                                                      
-    def get_valid_moves(self, piece, must_attack):
+    def get_valid_moves(self, piece: Piece, must_attack: bool) -> set[tuple[int, int, Piece | None]]:
         if piece.king:
             attacking_moves = self.get_king_attacking_moves(piece)
             if attacking_moves or must_attack:
@@ -176,9 +175,9 @@ class Board:
             attacking_moves = self.get_checker_attacking_moves(piece)
             if attacking_moves or must_attack:
                 return attacking_moves
-            return self.get_сhecker_walknig_moves(piece)
+            return self.get_checker_walking_moves(piece)
 
-    def possible_to_attack(self, turn):
+    def possible_to_attack(self, turn: tuple[int, int, int]) -> bool:
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.get_piece(row, col)
@@ -197,7 +196,7 @@ class Board:
                     return True
         return False
 
-    def possible_to_move(self, turn, must_attack):
+    def possible_to_move(self, turn: tuple[int, int, int], must_attack: bool) -> bool:
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.get_piece(row, col)

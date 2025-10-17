@@ -3,7 +3,7 @@ from .board import Board
 from .constants import WHITE, BLACK
 
 class Game:
-    def __init__(self, window):
+    def __init__(self, window: pygame.Surface) -> None:
         self.turn = WHITE
         self.selected = None
         self.valid_moves = set()
@@ -14,8 +14,8 @@ class Game:
         self.board = Board()
         self.board.create_board()
         
-    def update(self):
-        if self.board.white_left < 1 :
+    def update(self) -> None:
+        if self.board.white_left < 1:
             print("black win")
             pygame.quit()
             sys.exit()
@@ -26,7 +26,7 @@ class Game:
             sys.exit()
         
         elif not self.board.possible_to_move(self.turn, self.must_attack):
-            if self. turn == WHITE:
+            if self.turn == WHITE:
                 print("black win (no moves for white)")
             else:
                 print("white win (no moves for black)")
@@ -41,8 +41,7 @@ class Game:
         
         pygame.display.update()
         
-    def select(self, row, col) -> bool:
-        
+    def select(self, row: int, col: int) -> bool:
         if self.selected:
             result = self.move(row, col)
             if not result and not self.attack_continue:
@@ -58,7 +57,7 @@ class Game:
             
         return False
         
-    def move(self, row, col) -> bool:
+    def move(self, row: int, col: int) -> bool:
         move = self.find_valid_move(row, col)
         if not move:
             return False
@@ -82,18 +81,18 @@ class Game:
             
         return True
     
-    def find_valid_move(self, row, col):
+    def find_valid_move(self, row: int, col: int) -> tuple[int, int, any] | None:
         for move in self.valid_moves:
             if (row, col) == (move[0], move[1]):
                 return move
         return None
 
-    def draw_valid_moves(self, ):
+    def draw_valid_moves(self) -> None:
         if self.selected:
             for move in self.valid_moves:
                 self.board.draw_valid_move(self.window, move)
 
-    def change_turn(self):        
+    def change_turn(self) -> None:        
         if self.turn == WHITE:
             self.turn = BLACK
         else:
@@ -102,6 +101,3 @@ class Game:
         self.selected = None
         self.attack_continue = False
         self.must_attack = self.board.possible_to_attack(self.turn)
-
-                
- 
