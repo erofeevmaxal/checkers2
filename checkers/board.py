@@ -154,7 +154,7 @@ class Board:
                         break
                     
                     if square:
-                        if target:
+                        if target or square.color == piece.color:
                             break
                         else:
                             target = square
