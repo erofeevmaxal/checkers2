@@ -15,12 +15,12 @@ class Game:
         self.board.create_board()
         
     def update(self):
-        self.board.draw(self.window)
-        
+        self.board.draw(self.window)        
+                
         if self.selected:
             self.valid_moves = self.board.get_valid_moves(self.selected, self.must_attack)
-            
         self.draw_valid_moves()
+        
         pygame.display.update()
         
     def select(self, row, col) -> bool:
@@ -70,6 +70,11 @@ class Game:
                 return move
         return None
 
+    def draw_valid_moves(self, ):
+        if self.selected:
+            for move in self.valid_moves:
+                self.board.draw_valid_move(self.window, move)
+
     def change_turn(self):        
         if self.turn == WHITE:
             self.turn = BLACK
@@ -80,10 +85,5 @@ class Game:
         self.attack_continue = False
         self.must_attack = self.board.possible_to_attack(self.turn)
 
-
-    def draw_valid_moves(self):
-        if self.selected:
-            for move in self.valid_moves:
-                self.board.draw_valid_move(self.window, move)
                 
  

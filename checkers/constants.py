@@ -19,3 +19,5 @@ OUTLINE = 3
 
 CROWN_WHITE = pygame.transform.scale(pygame.image.load('assets/crown_white.png'), (45, 30))
 CROWN_BLACK = pygame.transform.scale(pygame.image.load('assets/crown_black.png'), (45, 30))
+
+FONT_SIZE = 30

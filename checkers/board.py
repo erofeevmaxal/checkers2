@@ -1,7 +1,7 @@
 import pygame
 from .piece import Piece
 from typing import Tuple, Set
-from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, HEIGHT, LINES, BLACK, WHITE, OUTLINE_COLLOR, MOVE_RAD
+from .constants import LIGHT, DARK, BOX_COLLOR, ROWS, COLS, BOX_SIZE, SQUARE_SIZE, WIDTH, HEIGHT, LINES, BLACK, WHITE, OUTLINE_COLLOR, MOVE_RAD, FONT_SIZE
 
 
 
@@ -24,14 +24,6 @@ class Board:
         y = SQUARE_SIZE * row + BOX_SIZE + SQUARE_SIZE // 2
         return (x, y)
         
-    def draw_squares(self, window):
-        window.fill(BOX_COLLOR)
-        pygame.draw.rect(window, LIGHT, (BOX_SIZE, BOX_SIZE, WIDTH, HEIGHT))
-        
-        for row in range(ROWS):
-            for col in range(1 - row % 2, COLS, 2):
-                pygame.draw.rect(window, DARK, (BOX_SIZE + SQUARE_SIZE * col, BOX_SIZE + SQUARE_SIZE * row, SQUARE_SIZE, SQUARE_SIZE))
-                
     def create_board(self):
         for row in range(LINES):
             for col in range(1 - row % 2, COLS, 2):
@@ -39,7 +31,15 @@ class Board:
                 
         for row in range(ROWS - LINES, ROWS):
             for col in range(1 - row % 2, COLS, 2):
-                self.board[row][col] = Piece(row, col, WHITE)
+                self.board[row][col] = Piece(row, col, WHITE)        
+    
+    def draw_squares(self, window):
+        window.fill(BOX_COLLOR)
+        pygame.draw.rect(window, LIGHT, (BOX_SIZE, BOX_SIZE, WIDTH, HEIGHT))
+        
+        for row in range(ROWS):
+            for col in range(1 - row % 2, COLS, 2):
+                pygame.draw.rect(window, DARK, (BOX_SIZE + SQUARE_SIZE * col, BOX_SIZE + SQUARE_SIZE * row, SQUARE_SIZE, SQUARE_SIZE))
 
     def draw_pieces(self, window):
         for row in range(ROWS):
@@ -49,14 +49,43 @@ class Board:
                 elif type(self.board[row][col]) == Piece:
                     self.board[row][col].draw(window)
 
+    def draw_coordinates(self, window):
+        for col in range(COLS):
+            x = BOX_SIZE + col * SQUARE_SIZE + SQUARE_SIZE // 2
+            y1 = BOX_SIZE // 2
+            y2 = BOX_SIZE + ROWS * SQUARE_SIZE + BOX_SIZE // 2
+            
+            font = pygame.font.Font(None, FONT_SIZE)
+            text = font.render(chr(col + ord('a')), True, BLACK)
 
+            text_rect1 = text.get_rect(center=(x, y1))
+            text_rect2 = text.get_rect(center=(x, y2))
+            
+            window.blit(text, text_rect1)
+            window.blit(text, text_rect2)
+            
+        for row in range(ROWS):
+            x1 = BOX_SIZE // 2
+            x2 = BOX_SIZE + COLS * SQUARE_SIZE + BOX_SIZE // 2
+            y = BOX_SIZE + SQUARE_SIZE * row + SQUARE_SIZE // 2
+            
+            font = pygame.font.Font(None, FONT_SIZE)
+            text = font.render(chr(8 - row + ord('0')), True, BLACK)
+
+            text_rect1 = text.get_rect(center=(x1, y))
+            text_rect2 = text.get_rect(center=(x2, y))
+            
+            window.blit(text, text_rect1)
+            window.blit(text, text_rect2)
+            
     def draw_valid_move(self, window, move):
         row, col, target = move
         pygame.draw.circle(window, OUTLINE_COLLOR, self.calculate_pos(row, col), MOVE_RAD)
-                    
+                
     def draw(self, window):
         self.draw_squares(window)
         self.draw_pieces(window)
+        self.draw_coordinates(window)
         
     def move_piece(self, piece, row, col) -> int:
         if self.board[row][col] != 0:

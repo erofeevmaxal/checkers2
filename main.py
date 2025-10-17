@@ -5,6 +5,7 @@ from checkers.game import Game
 
 WINDOW = pygame.display.set_mode((WIDTH + BOX_SIZE * 2, HEIGHT + BOX_SIZE * 2))
 pygame.display.set_caption('Сheckers')
+pygame.font.init()
 
 def get_row_col_from_mouse(pos):
     x, y = pos
