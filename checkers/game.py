@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from .board import Board
 from .constants import WHITE, BLACK
 
@@ -15,6 +15,24 @@ class Game:
         self.board.create_board()
         
     def update(self):
+        if self.board.white_left < 1 :
+            print("black win")
+            pygame.quit()
+            sys.exit()
+    
+        elif self.board.black_left < 1:
+            print("white win")
+            pygame.quit()
+            sys.exit()
+        
+        elif not self.board.possible_to_move(self.turn, self.must_attack):
+            if self. turn == WHITE:
+                print("black win (no moves for white)")
+            else:
+                print("white win (no moves for black)")
+            pygame.quit()
+            sys.exit()
+            
         self.board.draw(self.window)        
                 
         if self.selected:

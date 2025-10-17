@@ -9,7 +9,6 @@ class Board:
     def __init__(self):
         self.board = [[0]*COLS for i in range(ROWS)]
         self.white_left = self.black_left = 12
-        self.white_kings = self.black_kings = 0
     
     def inside(self, row, col):
         return 0 <= row < ROWS and 0 <= col < COLS
@@ -97,14 +96,16 @@ class Board:
         
         if row == ROWS - 1 or row == 0:
             piece.make_king()
-            if piece.color == WHITE:
-                self.white_kings += 1
-            else:
-                self.black_kings += 1
+
         return 1
         
     def remove_piece(self, piece):
         self.board[piece.row][piece.col] = 0
+        
+        if piece.color == WHITE:
+            self.white_left -= 1
+        else:
+            self.black_left -= 1
     
     def get_сhecker_walknig_moves(self, piece: Piece):
         output = set()
@@ -154,7 +155,7 @@ class Board:
                         break
                     
                     if square:
-                        if square.color == piece.color:
+                        if target:
                             break
                         else:
                             target = square
@@ -181,6 +182,7 @@ class Board:
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.get_piece(row, col)
+                
                 if not piece:
                     continue
                 if piece.color != turn:
@@ -190,6 +192,22 @@ class Board:
                     moves = self.get_king_attacking_moves(piece)
                 else:
                     moves = self.get_checker_attacking_moves(piece)
+                    
+                if moves:
+                    return True
+        return False
+
+    def possible_to_move(self, turn, must_attack):
+        for row in range(ROWS):
+            for col in range(COLS):
+                piece = self.get_piece(row, col)
+                
+                if not piece:
+                    continue
+                if piece.color != turn:
+                    continue
+                
+                moves = self.get_valid_moves(piece, must_attack)
                     
                 if moves:
                     return True
